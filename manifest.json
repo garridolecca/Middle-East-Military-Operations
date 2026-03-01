@@ -1,0 +1,11 @@
+{
+  "name": "Middle East Military Operations",
+  "short_name": "ME Mil Ops",
+  "description": "U.S. Naval Deployments & Regional Tensions — February 2026",
+  "start_url": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#0f3460",
+  "background_color": "#1a1a2e",
+  "icons": []
+}

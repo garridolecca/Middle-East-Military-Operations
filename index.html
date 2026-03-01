@@ -2,8 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
   <title>Middle East Military Operations — February 2026</title>
+
+  <!-- PWA / Mobile Web App -->
+  <meta name="theme-color" content="#0f3460" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="manifest.json" />
 
   <!-- ArcGIS Maps SDK 5.0 (unified: Core + Calcite + all packages) -->
   <script type="module" src="https://js.arcgis.com/5.0/"></script>
@@ -14,9 +21,18 @@
 </head>
 <body class="calcite-mode-dark">
 
+  <!-- ─── Mobile Header (hidden on desktop) ─── -->
+  <header class="mobile-header" id="mobile-header">
+    <div class="mobile-header-left">
+      <calcite-icon icon="globe" scale="s"></calcite-icon>
+      <span class="mobile-header-title">ME Military Ops</span>
+    </div>
+    <span class="mobile-header-badge">FEB 2026</span>
+  </header>
+
   <calcite-shell>
     <!-- ─── Header ─── -->
-    <calcite-navigation slot="header">
+    <calcite-navigation slot="header" id="desktop-nav">
       <calcite-navigation-logo
         slot="logo"
         heading="Middle East Military Operations"
@@ -164,6 +180,35 @@
     </calcite-shell-panel>
 
   </calcite-shell>
+
+  <!-- ─── Mobile Backdrop ─── -->
+  <div class="mobile-backdrop" id="mobile-backdrop"></div>
+
+  <!-- ─── Mobile Floating Action Buttons ─── -->
+  <div class="mobile-fab-group" id="mobile-fab-group">
+    <button class="mobile-fab" id="mobile-btn-home" aria-label="Reset view">
+      <calcite-icon icon="home" scale="s"></calcite-icon>
+    </button>
+    <button class="mobile-fab" id="mobile-btn-basemap" aria-label="Switch basemap">
+      <calcite-icon icon="basemap" scale="s"></calcite-icon>
+    </button>
+  </div>
+
+  <!-- ─── Mobile Bottom Navigation ─── -->
+  <nav class="mobile-nav" id="mobile-nav">
+    <button class="mobile-nav-tab active" data-panel="map" aria-label="Map">
+      <calcite-icon icon="map" scale="s"></calcite-icon>
+      <span>Map</span>
+    </button>
+    <button class="mobile-nav-tab" data-panel="intel" aria-label="Operations">
+      <calcite-icon icon="file-report" scale="s"></calcite-icon>
+      <span>Intel</span>
+    </button>
+    <button class="mobile-nav-tab" data-panel="timeline" aria-label="Timeline">
+      <calcite-icon icon="clock" scale="s"></calcite-icon>
+      <span>Events</span>
+    </button>
+  </nav>
 
   <!-- App logic -->
   <script type="module" src="js/app.js"></script>

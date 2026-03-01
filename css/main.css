@@ -13,6 +13,11 @@
   --route-gold: #f4a261;
   --attack-orange: #f77f00;
   --radius-fill: rgba(230, 57, 70, 0.08);
+  --mobile-nav-height: 56px;
+  --mobile-header-height: 48px;
+  --mobile-panel-radius: 20px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
 }
 
 /* ─── Reset & Base ─── */
@@ -25,6 +30,11 @@ html, body {
   background: #1a1a2e;
   color: #e0e0e0;
   overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  overscroll-behavior: none;
 }
 
 calcite-shell {
@@ -195,8 +205,16 @@ calcite-block {
   50% { box-shadow: 0 0 12px rgba(6, 214, 160, 0.8); }
 }
 
-/* ─── Responsive ─── */
-@media (max-width: 900px) {
+/* ─── Mobile-only elements (hidden on desktop) ─── */
+.mobile-header,
+.mobile-nav,
+.mobile-backdrop,
+.mobile-fab-group {
+  display: none;
+}
+
+/* ─── Desktop Responsive ─── */
+@media (max-width: 900px) and (min-width: 769px) {
   calcite-shell-panel {
     --calcite-shell-panel-width: 260px;
   }
@@ -205,8 +223,364 @@ calcite-block {
   }
 }
 
-@media (max-width: 600px) {
-  #panel-start {
-    display: none;
+/* ═══════════════════════════════════════════════════════
+   MOBILE — Native App Experience (≤768px)
+   ═══════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ─── Hide desktop header ─── */
+  #desktop-nav {
+    display: none !important;
+  }
+
+  /* ─── Mobile Header ─── */
+  .mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--mobile-header-height);
+    padding: var(--safe-top) 16px 0 16px;
+    background: rgba(15, 52, 96, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 600;
+    box-sizing: border-box;
+  }
+
+  .mobile-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mobile-header-left calcite-icon {
+    color: var(--carrier-blue);
+  }
+
+  .mobile-header-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.3px;
+  }
+
+  .mobile-header-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--route-gold);
+    background: rgba(244, 162, 97, 0.15);
+    border: 1px solid rgba(244, 162, 97, 0.3);
+    padding: 3px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ─── Map fills between header and bottom nav ─── */
+  calcite-shell {
+    position: fixed !important;
+    top: var(--mobile-header-height) !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: calc(var(--mobile-nav-height) + var(--safe-bottom)) !important;
+    height: auto !important;
+  }
+
+  #viewDiv {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  /* ─── Shell panels become slide-up overlays ─── */
+  #panel-start,
+  #panel-end {
+    display: block !important;
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: calc(var(--mobile-nav-height) + var(--safe-bottom)) !important;
+    top: auto !important;
+    width: 100% !important;
+    height: 78vh !important;
+    max-height: calc(100vh - var(--mobile-header-height) - var(--mobile-nav-height) - var(--safe-bottom)) !important;
+    z-index: 500;
+    border-radius: var(--mobile-panel-radius) var(--mobile-panel-radius) 0 0;
+    transform: translateY(110%);
+    transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+    overflow: hidden;
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.5);
+    --calcite-shell-panel-width: 100% !important;
+  }
+
+  #panel-start.mobile-open,
+  #panel-end.mobile-open {
+    transform: translateY(0);
+  }
+
+  /* Drag handle indicator on panels */
+  #panel-start::before,
+  #panel-end::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.25);
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  /* Panel inner content scrollable */
+  #panel-start calcite-panel,
+  #panel-end calcite-panel {
+    max-height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-top: 8px;
+  }
+
+  /* Larger touch targets for toggles */
+  calcite-label {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 0.88rem;
+  }
+
+  /* ─── Mobile Backdrop ─── */
+  .mobile-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 450;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .mobile-backdrop.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* ─── Mobile Floating Action Buttons ─── */
+  .mobile-fab-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: fixed;
+    right: 14px;
+    bottom: calc(var(--mobile-nav-height) + var(--safe-bottom) + 14px);
+    z-index: 400;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .mobile-fab-group.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.8);
+  }
+
+  .mobile-fab {
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+    border: none;
+    background: rgba(15, 52, 96, 0.9);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+    transition: transform 0.15s ease, background 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-fab:active {
+    transform: scale(0.9);
+    background: rgba(15, 52, 96, 1);
+  }
+
+  .mobile-fab calcite-icon {
+    color: var(--carrier-blue);
+  }
+
+  /* ─── Mobile Bottom Navigation ─── */
+  .mobile-nav {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-around;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--mobile-nav-height);
+    padding-bottom: var(--safe-bottom);
+    background: rgba(15, 20, 40, 0.94);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    z-index: 700;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-nav-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    padding: 6px 0;
+    position: relative;
+    transition: color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    font-family: inherit;
+  }
+
+  .mobile-nav-tab calcite-icon {
+    transition: transform 0.2s ease;
+  }
+
+  .mobile-nav-tab span {
+    font-size: 0.62rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .mobile-nav-tab.active {
+    color: var(--carrier-blue);
+  }
+
+  .mobile-nav-tab.active calcite-icon {
+    transform: scale(1.1);
+  }
+
+  /* Active indicator dot */
+  .mobile-nav-tab.active::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--carrier-blue);
+  }
+
+  .mobile-nav-tab:active {
+    transform: scale(0.92);
+  }
+
+  /* ─── Mobile popup adjustments ─── */
+  .esri-popup__main-container {
+    max-width: 90vw !important;
+    font-size: 0.85rem;
+  }
+
+  /* ─── ArcGIS widget adjustments for mobile ─── */
+  .esri-ui-corner {
+    margin: 0 !important;
+  }
+
+  .esri-ui-bottom-right {
+    bottom: 8px !important;
+    right: 66px !important;
+  }
+
+  .esri-ui-bottom-left {
+    bottom: 8px !important;
+    left: 8px !important;
+  }
+
+  /* Hide BasemapToggle widget on mobile (replaced by FAB) */
+  .esri-basemap-toggle {
+    display: none !important;
+  }
+
+  /* ─── Mobile SITREP tweaks ─── */
+  .sitrep-content {
+    font-size: 0.88rem;
+    line-height: 1.65;
+  }
+
+  .sitrep-content p {
+    margin: 8px 0;
+  }
+
+  .sitrep-content li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+
+  /* ─── Mobile Stats Grid ─── */
+  .stats-grid {
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 14px 12px;
+  }
+
+  .stat-value {
+    font-size: 1.6rem;
+  }
+
+  .stat-label {
+    font-size: 0.72rem;
+  }
+
+  /* ─── Mobile Timeline ─── */
+  .timeline-item {
+    margin-bottom: 18px;
+    padding-left: 14px;
+  }
+
+  .timeline-date {
+    font-size: 0.72rem;
+  }
+
+  .timeline-text {
+    font-size: 0.84rem;
+    line-height: 1.5;
+  }
+}
+
+/* ─── Extra small phones (≤380px) ─── */
+@media (max-width: 380px) {
+  .mobile-header-title {
+    font-size: 0.85rem;
+  }
+
+  .stat-value {
+    font-size: 1.3rem;
+  }
+
+  .mobile-nav-tab span {
+    font-size: 0.58rem;
   }
 }
