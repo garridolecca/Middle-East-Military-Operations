@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Hull -->
+  <ellipse cx="32" cy="38" rx="28" ry="10" fill="#0077b6" stroke="#00b4d8" stroke-width="1.5" opacity="0.9"/>
+  <!-- Flight deck -->
+  <rect x="10" y="28" width="44" height="12" rx="3" fill="#023e8a" stroke="#00b4d8" stroke-width="1"/>
+  <!-- Island superstructure -->
+  <rect x="38" y="20" width="10" height="10" rx="2" fill="#0096c7" stroke="#48cae4" stroke-width="0.8"/>
+  <!-- Radar mast -->
+  <line x1="43" y1="14" x2="43" y2="20" stroke="#48cae4" stroke-width="1.2"/>
+  <circle cx="43" cy="13" r="2.5" fill="none" stroke="#48cae4" stroke-width="0.8"/>
+  <!-- Angled flight deck lines -->
+  <line x1="14" y1="36" x2="36" y2="30" stroke="#90e0ef" stroke-width="0.6" opacity="0.6"/>
+  <line x1="14" y1="34" x2="36" y2="28" stroke="#90e0ef" stroke-width="0.6" opacity="0.4"/>
+  <!-- Catapult tracks -->
+  <line x1="12" y1="32" x2="30" y2="32" stroke="#caf0f8" stroke-width="0.5" opacity="0.5"/>
+  <line x1="12" y1="34" x2="28" y2="34" stroke="#caf0f8" stroke-width="0.5" opacity="0.5"/>
+  <!-- Aircraft on deck (tiny) -->
+  <polygon points="20,31 22,30 24,31 22,33" fill="#ade8f4" opacity="0.7"/>
+  <polygon points="26,32 28,31 30,32 28,34" fill="#ade8f4" opacity="0.7"/>
+  <!-- Wake -->
+  <path d="M4,38 Q8,44 16,42" fill="none" stroke="#90e0ef" stroke-width="0.8" opacity="0.4"/>
+  <!-- Glow pulse -->
+  <circle cx="32" cy="34" r="20" fill="none" stroke="#00b4d8" stroke-width="0.5" opacity="0.3">
+    <animate attributeName="r" values="18;24;18" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.3;0.1;0.3" dur="3s" repeatCount="indefinite"/>
+  </circle>
+</svg>

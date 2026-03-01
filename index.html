@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Middle East Military Operations — February 2026</title>
+
+  <!-- ArcGIS Maps SDK 5.0 (unified: Core + Calcite + all packages) -->
+  <script type="module" src="https://js.arcgis.com/5.0/"></script>
+  <link rel="stylesheet" href="https://js.arcgis.com/5.0/esri/themes/dark/main.css" />
+
+  <!-- App styles -->
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body class="calcite-mode-dark">
+
+  <calcite-shell>
+    <!-- ─── Header ─── -->
+    <calcite-navigation slot="header">
+      <calcite-navigation-logo
+        slot="logo"
+        heading="Middle East Military Operations"
+        description="U.S. Naval Deployments & Regional Tensions — Feb 2026"
+        icon="globe"
+      ></calcite-navigation-logo>
+
+      <calcite-action-pad slot="content-end" layout="horizontal" expand-disabled>
+        <calcite-action id="btn-home" icon="home" text="Reset view"></calcite-action>
+        <calcite-action id="btn-legend-toggle" icon="legend" text="Toggle legend"></calcite-action>
+        <calcite-action id="btn-basemap" icon="basemap" text="Switch basemap"></calcite-action>
+      </calcite-action-pad>
+    </calcite-navigation>
+
+    <!-- ─── Left Panel: Layer Controls & Intel ─── -->
+    <calcite-shell-panel slot="panel-start" width-scale="m" id="panel-start">
+      <calcite-panel heading="Operations Overview" description="Filter layers & view intelligence">
+
+        <!-- Layer Toggles -->
+        <calcite-block heading="Layer Visibility" open collapsible>
+          <calcite-icon slot="icon" icon="layers"></calcite-icon>
+
+          <calcite-label layout="inline-space-between">
+            U.S. Carrier Strike Groups
+            <calcite-switch id="toggle-carriers" checked></calcite-switch>
+          </calcite-label>
+          <calcite-label layout="inline-space-between">
+            Destroyer / Missile Defense
+            <calcite-switch id="toggle-destroyers" checked></calcite-switch>
+          </calcite-label>
+          <calcite-label layout="inline-space-between">
+            Iranian Military Sites
+            <calcite-switch id="toggle-iran-sites" checked></calcite-switch>
+          </calcite-label>
+          <calcite-label layout="inline-space-between">
+            Iranian Attack Vectors
+            <calcite-switch id="toggle-iran-attacks" checked></calcite-switch>
+          </calcite-label>
+          <calcite-label layout="inline-space-between">
+            U.S. Air Bases / Allies
+            <calcite-switch id="toggle-bases" checked></calcite-switch>
+          </calcite-label>
+          <calcite-label layout="inline-space-between">
+            Carrier Movement Routes
+            <calcite-switch id="toggle-routes" checked></calcite-switch>
+          </calcite-label>
+          <calcite-label layout="inline-space-between">
+            Threat / Strike Radii
+            <calcite-switch id="toggle-radii" checked></calcite-switch>
+          </calcite-label>
+        </calcite-block>
+
+        <!-- Situation Report -->
+        <calcite-block heading="SITREP — Feb 2026" collapsible open>
+          <calcite-icon slot="icon" icon="file-report"></calcite-icon>
+          <div class="sitrep-content">
+            <p><strong>USS Gerald R. Ford (CVN-78)</strong> — Transiting Eastern Mediterranean toward Suez Canal, carrying F-35C Lightning II & F/A-18E/F Super Hornets.</p>
+            <p><strong>USS Abraham Lincoln (CVN-72)</strong> — Positioned in the Persian Gulf as a "mobile fortress," providing strike capability within range of Iranian nuclear facilities.</p>
+            <p><strong>USS Bulkeley (DDG-84)</strong> — Eastern Mediterranean, Aegis missile defense shield supporting Israeli Iron Dome integration.</p>
+            <p><strong>USS Roosevelt (DDG-80)</strong> — Eastern Mediterranean, anti-ballistic missile watch, THAAD-capable radar coordination.</p>
+            <hr />
+            <p><strong>Iranian Aggression (2024-2026):</strong></p>
+            <ul>
+              <li>Apr 2024 — Iran launched 300+ drones & missiles at Israel ("Operation True Promise").</li>
+              <li>Oct 2024 — Ballistic missile salvo toward Israeli military bases.</li>
+              <li>Ongoing — Houthi (Yemen) anti-ship missiles targeting Red Sea commercial traffic.</li>
+              <li>Ongoing — Hezbollah rocket campaigns from southern Lebanon.</li>
+              <li>Feb 2026 — IRGC naval provocations in Strait of Hormuz; fast-boat swarm tactics.</li>
+            </ul>
+          </div>
+        </calcite-block>
+
+        <!-- Stats -->
+        <calcite-block heading="Force Summary" collapsible>
+          <calcite-icon slot="icon" icon="organization"></calcite-icon>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-value">2</span>
+              <span class="stat-label">Carrier Strike Groups</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value">2</span>
+              <span class="stat-label">Aegis Destroyers</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value">~90</span>
+              <span class="stat-label">Strike Aircraft</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value">5+</span>
+              <span class="stat-label">Allied Bases</span>
+            </div>
+          </div>
+        </calcite-block>
+      </calcite-panel>
+    </calcite-shell-panel>
+
+    <!-- ─── Map ─── -->
+    <div id="viewDiv"></div>
+
+    <!-- ─── Right Panel: Legend & Timeline ─── -->
+    <calcite-shell-panel slot="panel-end" width-scale="s" id="panel-end">
+      <calcite-panel heading="Legend & Timeline">
+
+        <calcite-block heading="Map Legend" open collapsible>
+          <calcite-icon slot="icon" icon="legend"></calcite-icon>
+          <div id="legend-container"></div>
+        </calcite-block>
+
+        <calcite-block heading="Key Events Timeline" collapsible open>
+          <calcite-icon slot="icon" icon="clock"></calcite-icon>
+          <div class="timeline">
+            <div class="timeline-item">
+              <span class="timeline-date">Apr 2024</span>
+              <span class="timeline-text">Iran "Operation True Promise" — 300+ drones/missiles at Israel</span>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-date">Oct 2024</span>
+              <span class="timeline-text">Iran ballistic missile salvo toward Israeli bases</span>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-date">2024-25</span>
+              <span class="timeline-text">Houthi anti-ship campaign in Red Sea / Bab el-Mandeb</span>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-date">2024-26</span>
+              <span class="timeline-text">Hezbollah rocket barrages from southern Lebanon</span>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-date">Jan 2026</span>
+              <span class="timeline-text">USS Ford CSG ordered to Eastern Mediterranean</span>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-date">Feb 2026</span>
+              <span class="timeline-text">USS Lincoln positioned in Persian Gulf; IRGC provocations in Strait of Hormuz</span>
+            </div>
+            <div class="timeline-item active">
+              <span class="timeline-date">Now</span>
+              <span class="timeline-text">Full naval armada deployed — maximum pressure posture</span>
+            </div>
+          </div>
+        </calcite-block>
+
+      </calcite-panel>
+    </calcite-shell-panel>
+
+  </calcite-shell>
+
+  <!-- App logic -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

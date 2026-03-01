@@ -1,0 +1,212 @@
+/* ================================================
+   Middle East Military Operations — Main Styles
+   ArcGIS JS SDK 5.0 + Calcite Design System
+   ================================================ */
+
+:root {
+  --app-accent: #e63946;
+  --app-accent-dim: rgba(230, 57, 70, 0.35);
+  --carrier-blue: #00b4d8;
+  --destroyer-teal: #48cae4;
+  --iran-red: #d62828;
+  --ally-green: #06d6a0;
+  --route-gold: #f4a261;
+  --attack-orange: #f77f00;
+  --radius-fill: rgba(230, 57, 70, 0.08);
+}
+
+/* ─── Reset & Base ─── */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: "Avenir Next", "Helvetica Neue", sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  overflow: hidden;
+}
+
+calcite-shell {
+  --calcite-color-brand: var(--app-accent);
+}
+
+/* ─── Map ─── */
+#viewDiv {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+/* Dark popup overrides */
+.esri-popup__main-container {
+  background: #16213e !important;
+  color: #e0e0e0 !important;
+  border: 1px solid rgba(230, 57, 70, 0.4);
+  border-radius: 6px;
+}
+
+/* ─── Navigation header ─── */
+calcite-navigation {
+  --calcite-navigation-background: #0f3460;
+}
+
+calcite-navigation-logo {
+  --calcite-color-text-1: #ffffff;
+  --calcite-color-text-3: #90caf9;
+}
+
+/* ─── Panels ─── */
+calcite-shell-panel {
+  --calcite-shell-panel-width: 320px;
+}
+
+calcite-panel {
+  --calcite-panel-background: #16213e;
+}
+
+calcite-block {
+  --calcite-block-background: #1a1a2e;
+}
+
+/* ─── SITREP ─── */
+.sitrep-content {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #c5c6c7;
+}
+
+.sitrep-content strong {
+  color: var(--carrier-blue);
+}
+
+.sitrep-content hr {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 10px 0;
+}
+
+.sitrep-content ul {
+  padding-left: 16px;
+  margin: 6px 0;
+}
+
+.sitrep-content li {
+  margin-bottom: 4px;
+  color: #adb5bd;
+}
+
+/* ─── Stats Grid ─── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.stat-card {
+  background: rgba(15, 52, 96, 0.6);
+  border: 1px solid rgba(0, 180, 216, 0.25);
+  border-radius: 8px;
+  padding: 12px 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--carrier-blue);
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #90caf9;
+}
+
+/* ─── Timeline ─── */
+.timeline {
+  position: relative;
+  padding-left: 18px;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(230, 57, 70, 0.3);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 14px;
+  padding-left: 12px;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -15px;
+  top: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--app-accent);
+  border: 2px solid #16213e;
+}
+
+.timeline-item.active::before {
+  background: #06d6a0;
+  box-shadow: 0 0 8px rgba(6, 214, 160, 0.6);
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+.timeline-date {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--route-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.timeline-text {
+  font-size: 0.78rem;
+  color: #adb5bd;
+  line-height: 1.4;
+}
+
+/* ─── Legend overrides ─── */
+#legend-container .esri-legend {
+  background: transparent !important;
+  color: #c5c6c7 !important;
+}
+
+/* ─── Animations ─── */
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 4px rgba(6, 214, 160, 0.4); }
+  50% { box-shadow: 0 0 12px rgba(6, 214, 160, 0.8); }
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 900px) {
+  calcite-shell-panel {
+    --calcite-shell-panel-width: 260px;
+  }
+  #panel-end {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  #panel-start {
+    display: none;
+  }
+}
