@@ -12,29 +12,18 @@ import {
   createRadiiLayer
 } from "./layers.js";
 
-// ─── Wait for ArcGIS modules ───
+// ─── Load ArcGIS modules via $arcgis.import() ───
 async function init() {
-  const [
-    { default: Map },
-    { default: MapView },
-    { default: Graphic },
-    { default: GraphicsLayer },
-    { default: Legend },
-    { default: BasemapToggle },
-    { default: ScaleBar },
-    { default: Locate },
-    reactiveUtils
-  ] = await Promise.all([
-    import("https://js.arcgis.com/5.0/esri/Map.js"),
-    import("https://js.arcgis.com/5.0/esri/views/MapView.js"),
-    import("https://js.arcgis.com/5.0/esri/Graphic.js"),
-    import("https://js.arcgis.com/5.0/esri/layers/GraphicsLayer.js"),
-    import("https://js.arcgis.com/5.0/esri/widgets/Legend.js"),
-    import("https://js.arcgis.com/5.0/esri/widgets/BasemapToggle.js"),
-    import("https://js.arcgis.com/5.0/esri/widgets/ScaleBar.js"),
-    import("https://js.arcgis.com/5.0/esri/widgets/Locate.js"),
-    import("https://js.arcgis.com/5.0/esri/core/reactiveUtils.js")
-  ]);
+  const [Map, MapView, Graphic, GraphicsLayer, Legend, BasemapToggle, ScaleBar] =
+    await Promise.all([
+      $arcgis.import("@arcgis/core/Map.js"),
+      $arcgis.import("@arcgis/core/views/MapView.js"),
+      $arcgis.import("@arcgis/core/Graphic.js"),
+      $arcgis.import("@arcgis/core/layers/GraphicsLayer.js"),
+      $arcgis.import("@arcgis/core/widgets/Legend.js"),
+      $arcgis.import("@arcgis/core/widgets/BasemapToggle.js"),
+      $arcgis.import("@arcgis/core/widgets/ScaleBar.js")
+    ]);
 
   // ─── Build Layers ───
   const radiiLayer = createRadiiLayer(Graphic, GraphicsLayer);
