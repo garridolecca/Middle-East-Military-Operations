@@ -1,5 +1,7 @@
 # Middle East Military Operations
 
+**[Live App](https://garridolecca.github.io/Middle-East-Military-Operations/)**
+
 Interactive ArcGIS JavaScript API 5.0 application visualizing U.S. naval deployments, Iranian military sites, regional attack vectors, and allied base infrastructure in the Middle East as of February 2026.
 
 ## Features
