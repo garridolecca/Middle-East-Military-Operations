@@ -57,7 +57,7 @@ async function init() {
   });
 
   const homeCenter = [45, 30];
-  const homeZoom = 7;
+  const homeZoom = 3;
 
   // ─── View ───
   const view = new MapView({
@@ -121,7 +121,7 @@ async function init() {
   // ─── Opening animation ───
   view.when(() => {
     view.goTo(
-      { center: [45, 30], zoom: 7 },
+      { center: [45, 30], zoom: 3 },
       { duration: 2000, easing: "ease-in-out" }
     );
   });
