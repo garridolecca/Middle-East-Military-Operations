@@ -494,52 +494,195 @@ function calcBearing([lon1, lat1], [lon2, lat2]) {
 export function createRadiiLayer(Graphic, GraphicsLayer) {
   const layer = new GraphicsLayer({ id: "radii", title: "Strike / Threat Radii" });
 
-  carriers.forEach((c) => {
-    // U.S. strike radius — blue
+  // Helper: place a callout annotation at a specific point
+  function callout(lon, lat, text, color, bgColor, size = 9, yOff = 0) {
     layer.add(new Graphic({
-      geometry: circle(c.longitude, c.latitude, c.strikeRadius),
-      symbol: {
-        type: "simple-fill",
-        color: [0, 180, 216, 15],
-        outline: { color: [0, 180, 216, 120], width: 2, style: "dash" }
-      },
-      attributes: { name: c.name + " — F-35C Strike Radius", radius: c.strikeRadius + " km" },
-      popupTemplate: {
-        title: "{name}",
-        content: "<b>Combat radius:</b> {radius} (F-35C Lightning II)"
-      }
+      geometry: pt(lon, lat),
+      symbol: labelSymbol(text, color, size, yOff, bgColor)
     }));
+  }
 
-    // Label at edge of radius (north)
-    const labelLat = c.latitude + (c.strikeRadius / 6371) * (180 / Math.PI);
-    const tag = c.name.includes("Ford") ? "FORD STRIKE RANGE" : "LINCOLN STRIKE RANGE";
+  // Helper: dashed connector line from radius edge to callout
+  function connector(fromLon, fromLat, toLon, toLat, color) {
     layer.add(new Graphic({
-      geometry: pt(c.longitude, labelLat),
-      symbol: labelSymbol(tag + " (1,100 km)", [0, 180, 216, 180], 9, 0)
+      geometry: polyline([[fromLon, fromLat], [toLon, toLat]]),
+      symbol: { type: "simple-line", color, width: 1, style: "dot" }
     }));
-  });
+  }
 
-  // Iranian ballistic missile range — red
+  // ════════════════════════════════════════════════════
+  // USS FORD (CVN-78) — Eastern Med — 1,100 km radius
+  // Covers: Israel, Lebanon, Syria, Cyprus, W. Iraq
+  // ════════════════════════════════════════════════════
+  const ford = carriers.find(c => c.name.includes("Ford"));
+  const fordR = ford.strikeRadius;
+
+  layer.add(new Graphic({
+    geometry: circle(ford.longitude, ford.latitude, fordR),
+    symbol: {
+      type: "simple-fill",
+      color: [0, 0, 0, 0],
+      outline: { color: [0, 180, 216, 180], width: 2.5, style: "dash" }
+    },
+    attributes: {
+      name: "USS Ford — F-35C / F/A-18 Strike Radius",
+      radius: fordR + " km"
+    },
+    popupTemplate: {
+      title: "USS Gerald R. Ford (CVN-78) — Strike Radius",
+      content: `
+        <div style="font-size:13px;line-height:1.8;color:#e0e0e0">
+          <b style="color:#00b4d8">Combat Radius:</b> 1,100 km (F-35C Lightning II)<br/><br/>
+          <b style="color:#00b4d8">KEY ASSETS IN RANGE:</b><br/>
+          &#8226; All of <b>Israel</b> — direct air support & strike missions<br/>
+          &#8226; <b>Southern Lebanon / Hezbollah</b> positions — counter-rocket operations<br/>
+          &#8226; <b>Syria</b> — regime & Iranian proxy targets<br/>
+          &#8226; <b>Western Iraq</b> — militia staging areas<br/>
+          &#8226; <b>USS Bulkeley & USS Roosevelt</b> — integrated Aegis defense<br/>
+          &#8226; <b>RAF Akrotiri (Cyprus)</b> — coalition coordination<br/>
+          &#8226; <b>Incirlik AB (Turkey)</b> — NATO tanker & ISR support<br/><br/>
+          <b style="color:#ffdc64">WHY IT MATTERS:</b> The Ford CSG provides the western prong of a two-carrier
+          pincer. Its air wing can defend Israel, suppress Hezbollah & Syrian proxies,
+          and interdict Iranian weapons shipments through the Levant — all without
+          entering Iranian airspace.
+        </div>`
+    }
+  }));
+
+  // Ford — edge labels (N, S, E, W cardinal points)
+  const fordNLat = ford.latitude + (fordR / 6371) * (180 / Math.PI);
+  const fordSLat = ford.latitude - (fordR / 6371) * (180 / Math.PI);
+  const fordELon = ford.longitude + (fordR / 6371) * (180 / Math.PI) / Math.cos(ford.latitude * Math.PI / 180);
+
+  callout(ford.longitude, fordNLat, "FORD STRIKE RANGE — 1,100 km", [0, 180, 216, 220], [10, 20, 40, 220], 10, 8);
+
+  // Ford — asset callouts inside the radius
+  callout(35.2, 32.0, "ISRAEL\nFull air cover", [120, 200, 255, 255], [10, 20, 50, 220], 9, 0);
+  connector(ford.longitude, ford.latitude, 35.2, 32.3, [0, 180, 216, 60]);
+
+  callout(35.5, 33.8, "HEZBOLLAH\nCounter-rocket ops", [255, 180, 100, 240], [50, 20, 10, 200], 8, 14);
+
+  callout(38.5, 35.5, "SYRIA\nProxy targets in range", [120, 200, 255, 220], [10, 20, 50, 200], 8, 0);
+  connector(ford.longitude, ford.latitude, 38.5, 35.3, [0, 180, 216, 40]);
+
+  // ════════════════════════════════════════════════════
+  // USS LINCOLN (CVN-72) — Persian Gulf — 1,100 km radius
+  // Covers: ALL major Iranian nuclear sites, Tehran,
+  //         Bandar Abbas, Kharg Island, Gulf bases
+  // ════════════════════════════════════════════════════
+  const lincoln = carriers.find(c => c.name.includes("Lincoln"));
+  const lincolnR = lincoln.strikeRadius;
+
+  layer.add(new Graphic({
+    geometry: circle(lincoln.longitude, lincoln.latitude, lincolnR),
+    symbol: {
+      type: "simple-fill",
+      color: [0, 0, 0, 0],
+      outline: { color: [0, 220, 180, 180], width: 2.5, style: "dash" }
+    },
+    attributes: {
+      name: "USS Lincoln — F-35C / F/A-18 Strike Radius",
+      radius: lincolnR + " km"
+    },
+    popupTemplate: {
+      title: "USS Abraham Lincoln (CVN-72) — Strike Radius",
+      content: `
+        <div style="font-size:13px;line-height:1.8;color:#e0e0e0">
+          <b style="color:#06d6a0">Combat Radius:</b> 1,100 km (F-35C Lightning II)<br/><br/>
+          <b style="color:#06d6a0">KEY IRANIAN TARGETS IN RANGE:</b><br/>
+          &#8226; <b style="color:#ffdc64">Natanz</b> — primary uranium enrichment (underground, 60%+ purity)<br/>
+          &#8226; <b style="color:#ffdc64">Isfahan</b> — uranium conversion facility (UF6 pipeline)<br/>
+          &#8226; <b style="color:#ffdc64">Fordow</b> — hardened mountain bunker enrichment<br/>
+          &#8226; <b style="color:#ffdc64">Bushehr</b> — nuclear power reactor<br/>
+          &#8226; <b style="color:#d62828">Tehran / IRGC HQ</b> — ballistic missile command (borderline)<br/>
+          &#8226; <b style="color:#d62828">Parchin</b> — weapons research complex (borderline)<br/>
+          &#8226; <b>Bandar Abbas</b> — IRGC Navy HQ, Strait of Hormuz<br/>
+          &#8226; <b>Kharg Island</b> — 90% of Iran's oil exports<br/><br/>
+          <b style="color:#ffdc64">WHY IT MATTERS:</b> The Lincoln is the tip of the spear.
+          From the Persian Gulf, its air wing can strike <b>every major Iranian
+          nuclear facility</b> — Natanz, Isfahan, Fordow, and Bushehr — plus
+          the IRGC naval base controlling the Strait of Hormuz. This single
+          carrier group holds Iran's entire nuclear program and oil economy
+          at risk simultaneously.
+        </div>`
+    }
+  }));
+
+  // Lincoln — edge labels
+  const lincolnNLat = lincoln.latitude + (lincolnR / 6371) * (180 / Math.PI);
+  callout(lincoln.longitude, lincolnNLat, "LINCOLN STRIKE RANGE — 1,100 km", [0, 220, 180, 220], [10, 30, 30, 220], 10, 8);
+
+  // Lincoln — asset callouts: nuclear targets in range
+  callout(51.727, 33.724, "NATANZ\nPrimary enrichment", [255, 220, 100, 255], [60, 20, 10, 220], 9, -22);
+  connector(lincoln.longitude, lincoln.latitude, 51.727, 33.3, [0, 220, 180, 50]);
+
+  callout(51.668, 32.652, "ISFAHAN\nConversion facility", [255, 220, 100, 255], [60, 20, 10, 220], 9, 18);
+  connector(lincoln.longitude, lincoln.latitude, 51.668, 32.9, [0, 220, 180, 50]);
+
+  callout(50.5, 35.2, "FORDOW\nHardened bunker", [255, 220, 100, 255], [60, 20, 10, 220], 9, -16);
+  connector(lincoln.longitude, lincoln.latitude, 50.5, 34.88, [0, 220, 180, 50]);
+
+  callout(50.884, 28.5, "BUSHEHR\nNuclear reactor", [255, 180, 120, 240], [50, 20, 10, 200], 8, 14);
+
+  callout(56.27, 27.6, "BANDAR ABBAS\nIRGC Navy — Hormuz", [255, 150, 150, 240], [50, 15, 15, 200], 8, -18);
+  connector(lincoln.longitude, lincoln.latitude, 56.27, 27.18, [0, 220, 180, 40]);
+
+  callout(50.32, 29.6, "KHARG ISLAND\n90% Iran oil exports", [255, 200, 130, 230], [50, 25, 10, 200], 8, -16);
+
+  // ════════════════════════════════════════════════════
+  // IRANIAN BALLISTIC MISSILE RANGE — 2,000 km from Tehran
+  // Covers: Israel, ALL U.S. bases, BOTH carriers,
+  //         Saudi Arabia, Turkey, Egypt
+  // ════════════════════════════════════════════════════
   layer.add(new Graphic({
     geometry: circle(51.39, 35.7, 2000),
     symbol: {
       type: "simple-fill",
-      color: [214, 40, 40, 10],
-      outline: { color: [214, 40, 40, 100], width: 2, style: "dash" }
+      color: [0, 0, 0, 0],
+      outline: { color: [214, 40, 40, 160], width: 2.5, style: "dash" }
     },
     attributes: { name: "Iranian Ballistic Missile Range", radius: "~2,000 km" },
     popupTemplate: {
-      title: "Iranian Ballistic Missile Range (Shahab-3 / Emad)",
-      content: "<b>Estimated range:</b> ~2,000 km from Tehran"
+      title: "Iranian Ballistic Missile Range (Shahab-3 / Emad / Sejjil)",
+      content: `
+        <div style="font-size:13px;line-height:1.8;color:#e0e0e0">
+          <b style="color:#d62828">Range:</b> ~2,000 km from Tehran (IRGC Aerospace Force HQ)<br/><br/>
+          <b style="color:#d62828">U.S. / ALLIED ASSETS UNDER THREAT:</b><br/>
+          &#8226; <b style="color:#ffdc64">Israel</b> — ~1,500 km, well within range of Shahab-3 & Emad<br/>
+          &#8226; <b style="color:#00b4d8">USS Ford CSG</b> — Eastern Med, within missile envelope<br/>
+          &#8226; <b style="color:#00b4d8">USS Lincoln CSG</b> — Persian Gulf, within missile envelope<br/>
+          &#8226; <b style="color:#00b4d8">USS Bulkeley & Roosevelt</b> — in range (why Aegis BMD is critical)<br/>
+          &#8226; <b style="color:#06d6a0">Al Udeid AB (Qatar)</b> — CENTCOM forward HQ at risk<br/>
+          &#8226; <b style="color:#06d6a0">Al Dhafra AB (UAE)</b> — F-22 / F-35 base at risk<br/>
+          &#8226; <b style="color:#06d6a0">NSA Bahrain</b> — 5th Fleet HQ at risk<br/>
+          &#8226; <b style="color:#06d6a0">Camp Arifjan (Kuwait)</b> — Army staging hub at risk<br/>
+          &#8226; <b style="color:#06d6a0">Incirlik AB (Turkey)</b> — NATO base at risk<br/>
+          &#8226; <b>Saudi Arabia, Egypt, S. Turkey</b> — major population centers<br/><br/>
+          <b style="color:#ffdc64">WHY IT MATTERS:</b> Iran's Shahab-3, Emad, and Sejjil missiles
+          can reach <b>every single U.S. asset in the region</b> — both carriers,
+          all destroyers, and every allied air base. This is precisely why the
+          USS Bulkeley and Roosevelt are positioned for <b>Aegis ballistic missile
+          defense</b>, and why Israel's Arrow-3 and Iron Dome are on full alert.
+          The entire U.S. deployment operates inside Iran's threat envelope.
+        </div>`
     }
   }));
 
-  // Label at north edge of Iranian range
-  const iranLabelLat = 35.7 + (2000 / 6371) * (180 / Math.PI);
-  layer.add(new Graphic({
-    geometry: pt(51.39, iranLabelLat),
-    symbol: labelSymbol("IRAN MISSILE RANGE (2,000 km)", [255, 120, 120, 200], 9, 0, [40, 10, 10, 200])
-  }));
+  // Iran range — edge labels (multiple sides for visibility)
+  const iranNLat = 35.7 + (2000 / 6371) * (180 / Math.PI);
+  const iranSLat = 35.7 - (2000 / 6371) * (180 / Math.PI);
+  const iranWLon = 51.39 - (2000 / 6371) * (180 / Math.PI) / Math.cos(35.7 * Math.PI / 180);
+
+  callout(51.39, iranNLat, "IRAN MISSILE RANGE — 2,000 km (Shahab-3 / Emad)", [255, 100, 100, 230], [50, 10, 10, 220], 10, 8);
+  callout(iranWLon + 2, 35.7, "ALL U.S. FORCES\nINSIDE THIS ENVELOPE", [255, 160, 160, 220], [50, 10, 10, 200], 9, 0);
+
+  // Threat callouts — what Iran can hit
+  callout(35.21, 31.0, "ISRAEL\nShahab-3 target (~1,500 km)", [255, 130, 130, 240], [50, 10, 10, 200], 8, 0);
+  connector(51.39, 35.7, 35.21, 31.5, [214, 40, 40, 35]);
+
+  callout(51.315, 24.3, "AL UDEID + NSA BAHRAIN\nCENTCOM & 5th Fleet at risk", [255, 130, 130, 220], [50, 10, 10, 200], 8, 0);
+
+  callout(35.425, 37.6, "INCIRLIK\nNATO base at risk", [255, 130, 130, 200], [50, 10, 10, 200], 8, -14);
 
   return layer;
 }
