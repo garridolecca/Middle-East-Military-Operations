@@ -9,7 +9,8 @@ import {
   createAttackLayer,
   createBasesLayer,
   createRoutesLayer,
-  createRadiiLayer
+  createRadiiLayer,
+  createLabelLayers
 } from "./layers.js";
 
 // ─── Load ArcGIS modules via $arcgis.import() ───
@@ -25,7 +26,7 @@ async function init() {
       $arcgis.import("@arcgis/core/widgets/ScaleBar.js")
     ]);
 
-  // ─── Build Layers ───
+  // ─── Build Feature Layers ───
   const radiiLayer = createRadiiLayer(Graphic, GraphicsLayer);
   const routesLayer = createRoutesLayer(Graphic, GraphicsLayer);
   const attackLayer = createAttackLayer(Graphic, GraphicsLayer);
@@ -33,6 +34,9 @@ async function init() {
   const iranSitesLayer = createIranSitesLayer(Graphic, GraphicsLayer);
   const destroyerLayer = createDestroyerLayer(Graphic, GraphicsLayer);
   const carrierLayer = createCarrierLayer(Graphic, GraphicsLayer);
+
+  // ─── Build Scale-Dependent Label Layers ───
+  const labels = createLabelLayers(Graphic, GraphicsLayer);
 
   // ─── Map ───
   const map = new Map({
@@ -44,7 +48,11 @@ async function init() {
       basesLayer,
       iranSitesLayer,
       destroyerLayer,
-      carrierLayer
+      carrierLayer,
+      // Labels on top, ordered by zoom tier
+      labels.detail,    // zoom 8+ (bottom of label stack)
+      labels.regional,  // zoom 6+
+      labels.overview   // always visible (top of label stack)
     ]
   });
 
